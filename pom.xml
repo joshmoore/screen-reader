@@ -52,7 +52,7 @@
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-      <bioformats.version>5.1.11-SNAPSHOT</bioformats.version>
+      <bioformats.version>5.7.2</bioformats.version>
   </properties>
 
   <dependencies>
@@ -67,14 +67,21 @@
       <version>${bioformats.version}</version>
     </dependency>
   </dependencies>
-  <!--
   <repositories>
     <repository>
-      <id>ome.metadata</id>
-      <name>ome.metadata</name>
-      <url>http://artifacts.openmicroscopy.org/artifactory/metadata/</url>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+    <repository>
+      <id>unidata</id>
+      <name>Unidata Repository</name>
+      <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
+    </repository>
+    <repository>
+      <id>ome</id>
+      <name>OME Artifactory</name>
+      <url>https://artifacts.openmicroscopy.org/artifactory/maven/</url>
     </repository>
   </repositories>
-  -->
-
 </project>
