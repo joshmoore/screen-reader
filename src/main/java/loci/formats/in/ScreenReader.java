@@ -9,15 +9,15 @@
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 2 of the 
+ * published by the Free Software Foundation, either version 2 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public 
+ *
+ * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-2.0.html>.
  * #L%
@@ -32,6 +32,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
 import loci.common.DataTools;
 import loci.common.IniList;
@@ -132,9 +134,10 @@ public class ScreenReader extends FormatReader {
     ClassList<IFormatReader> classes = new ClassList<IFormatReader>(IFormatReader.class);
     classes.addClass(chosenReader);
     reader = new ImageReader(classes);
-    reader.setMetadataOptions(new DefaultMetadataOptions(MetadataLevel.MINIMUM));
+    reader.setMetadataOptions(new DynamicMetadataOptions(MetadataLevel.MINIMUM));
     // memoize whatever files are opened internally if possible.
-    reader = Memoizer.wrap(getMetadataOptions(), reader);
+    // TMP: does not exist on mainline
+    // reader = Memoizer.wrap(getMetadataOptions(), reader);
   }
 
   /* @see loci.formats.IFormatReader#isSingleFile(String) */
@@ -197,7 +200,7 @@ public class ScreenReader extends FormatReader {
     FormatTools.assertId(currentId, true, 1);
 
     int spotIndex = seriesMap.get(getCoreIndex());
-    final List<String> allFiles = new ArrayList<String>();
+    final Set<String> allFiles = new LinkedHashSet<String>();
     try {
       for (String file : files[spotIndex]) {
         reader.close();
@@ -363,8 +366,23 @@ public class ScreenReader extends FormatReader {
 
     core.clear();
 
+    String excludeReadersEntry = plateTable.get("ExcludeReaders");
+    if (null != excludeReadersEntry) {
+      String[] excludeReaders = excludeReadersEntry.split(",", -1);
+      for (String r : excludeReaders) {
+        try {
+          Class<? extends IFormatReader> c =
+            Class.forName(r).asSubclass(IFormatReader.class);
+          validReaders.removeClass(c);
+        } catch (ClassNotFoundException e) {
+          LOGGER.warn("Reader {} not found", r);
+        }
+      }
+    }
+
     ImageReader iReader = new ImageReader(validReaders);
     FileStitcher stitcher = new FileStitcher(iReader, true);
+    stitcher.setReaderClassList(validReaders);
     stitcher.setCanChangePattern(false);
     // After setReaderClassList
     reader = new DimensionSwapper(stitcher);
