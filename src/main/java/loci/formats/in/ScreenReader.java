@@ -136,7 +136,8 @@ public class ScreenReader extends FormatReader {
     reader = new ImageReader(classes);
     reader.setMetadataOptions(new DynamicMetadataOptions(MetadataLevel.MINIMUM));
     // memoize whatever files are opened internally if possible.
-    reader = Memoizer.wrap(getMetadataOptions(), reader);
+    // TMP: does not exist on mainline
+    // reader = Memoizer.wrap(getMetadataOptions(), reader);
   }
 
   /* @see loci.formats.IFormatReader#isSingleFile(String) */
